@@ -1,0 +1,3 @@
+/Users/janpremzl/Desktop/sola/advent-of-code-2021/day-1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/janpremzl/Desktop/sola/advent-of-code-2021/day-1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/janpremzl/Desktop/sola/advent-of-code-2021/day-1/cmake-build-debug/CMakeFiles/day_1.dir
