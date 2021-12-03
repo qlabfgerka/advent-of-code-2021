@@ -9,15 +9,9 @@ int help() {
     return -1;
 }
 
-int pilot(const string &filename) {
-    ifstream file(filename);
+int pilot(ifstream &file) {
     string command;
     int commandArgs, horizontal = 0, depth = 0;
-
-    if (!file.is_open()) {
-        return help();
-    }
-
     while (file >> command >> commandArgs) {
         if (command == "forward") {
             horizontal += commandArgs;
@@ -27,8 +21,37 @@ int pilot(const string &filename) {
             depth += commandArgs;
         }
     }
+    return horizontal * depth;
+}
 
-    cout << horizontal << " " << depth << " " << horizontal * depth << endl;
+int pilotAdvanced(ifstream &file) {
+    string command;
+    int commandArgs, horizontal = 0, depth = 0, aim = 0;
+    while (file >> command >> commandArgs) {
+        if (command == "forward") {
+            horizontal += commandArgs;
+            depth += aim * commandArgs;
+        } else if (command == "up") {
+            aim -= commandArgs;
+        } else if (command == "down") {
+            aim += commandArgs;
+        }
+    }
+    return horizontal * depth;
+}
+
+int pilotHelper(const string &filename, bool type) {
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        return help();
+    }
+
+    if (type) {
+        cout << pilot(file) << endl;
+    } else {
+        cout << pilotAdvanced(file) << endl;
+    }
 
     return 0;
 }
@@ -36,5 +59,5 @@ int pilot(const string &filename) {
 int main(int argc, char *argv[]) {
     if (argc != 2) return help();
 
-    return pilot(argv[1]);
+    return pilotHelper(argv[1], false);
 }
