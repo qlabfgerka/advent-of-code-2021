@@ -8,6 +8,7 @@ using namespace std;
 struct Bingo {
     int board[5][5];
     bool checked[5][5];
+    bool won;
 };
 
 int help() {
@@ -48,7 +49,17 @@ bool checkWin(Bingo bingo) {
     return false;
 }
 
-int play(const string& line, vector<Bingo> &bingo) {
+int wonBoards(vector<Bingo> bingo) {
+    int won = 0;
+    for (int i = 0; i < bingo.size(); i++) {
+        if (bingo[i].won) ++won;
+    }
+
+    return won;
+}
+
+int play(const string &line, vector<Bingo> &bingo, bool type) {
+    int wins = 0;
     stringstream ss(line);
     string number;
     while (getline(ss, number, ',')) {
@@ -58,7 +69,11 @@ int play(const string& line, vector<Bingo> &bingo) {
                     if (bingo[i].board[j][k] == stoi(number)) {
                         bingo[i].checked[j][k] = true;
                         if (checkWin(bingo[i])) {
-                            return uncheckedSum(bingo[i]) * stoi(number);
+                            bingo[i].won = true;
+                            if (!type) return uncheckedSum(bingo[i]) * stoi(number);
+                            else if (wonBoards(bingo) == bingo.size()) {
+                                return uncheckedSum(bingo[i]) * stoi(number);
+                            }
                         }
                     }
                 }
@@ -68,7 +83,7 @@ int play(const string& line, vector<Bingo> &bingo) {
     return 0;
 }
 
-int bingo(const string &filename) {
+int bingoHelper(const string &filename, bool type) {
     ifstream file(filename);
     int num, bingoIndex = 0, iIndex = 0, jIndex = 0;
     string line;
@@ -81,6 +96,7 @@ int bingo(const string &filename) {
     getline(file, line);
 
     bingo.push_back({});
+    bingo[0].won = false;
     while (file >> num) {
         bingo[bingoIndex].board[iIndex][jIndex] = num;
         bingo[bingoIndex].checked[iIndex][jIndex] = false;
@@ -93,12 +109,13 @@ int bingo(const string &filename) {
                 jIndex = 0;
                 bingo.push_back({});
                 bingoIndex++;
+                bingo[bingoIndex].won = false;
             }
         }
     }
     bingo.pop_back();
 
-    cout << play(line, bingo) << endl;
+    cout << play(line, bingo, type) << endl;
 
     return 0;
 }
@@ -106,5 +123,5 @@ int bingo(const string &filename) {
 int main(int argc, char *argv[]) {
     if (argc != 2) return help();
 
-    return bingo(argv[1]);
+    return bingoHelper(argv[1], true);
 }
