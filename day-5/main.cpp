@@ -32,14 +32,31 @@ void processNumber(int num, int &counter, Line &l, int &max) {
     if (counter == 3) l.y2 = num;
 }
 
-void drawLine(Line line, vector<vector<int>> &board) {
-    if (line.x1 != line.x2 && line.y1 != line.y2) return;
+void drawStraight(Line line, vector<vector<int>> &board) {
     int start = line.x1 == line.x2 ? line.y1 : line.x1;
     int end = line.x1 == line.x2 ? line.y2 : line.x2;
     string endString = line.x1 == line.x2 ? "y2" : "x2";
 
     for (int i = start; start > end ? i >= end : i <= end; start > end ? i-- : i++) {
         ++board[endString == "y2" ? i : line.y2][start == line.y1 ? line.x1 : i];
+    }
+}
+
+void drawDiagonal(Line line, vector<vector<int>> &board) {
+    bool iComp = line.x1 < line.x2;
+    bool jComp = line.y1 < line.y2;
+    for (int i = line.x1, j = line.y1;
+         iComp ? i <= line.x2 : i >= line.x2;
+         iComp ? i++ : i--, jComp ? j++ : j--) {
+        ++board[j][i];
+    }
+}
+
+void drawLine(Line line, vector<vector<int>> &board) {
+    if (line.x1 == line.x2 || line.y1 == line.y2) {
+        drawStraight(line, board);
+    } else if (line.x1 - line.y1 == line.x2 - line.y2 || line.x1 + line.y1 - line.x2 - line.y2 == 0) {
+        drawDiagonal(line, board);
     }
 }
 
