@@ -10,9 +10,17 @@ int help() {
     return -1;
 }
 
+long sum(vector<long> numbers) {
+    long sum = 0;
+    for (int i = 0; i < numbers.size(); i++) {
+        sum += numbers[i];
+    }
+    return sum;
+}
+
 int lanternfish(const string &filename) {
     ifstream file(filename);
-    vector<int> numbers;
+    vector<long> numbers(10);
     int num;
 
     if (!file.is_open()) {
@@ -20,22 +28,26 @@ int lanternfish(const string &filename) {
     }
 
     while (file >> num) {
-        numbers.push_back(num);
+        ++numbers[num];
 
         if (file.peek() == ',') file.ignore();
     }
 
-    for (int i = 0; i < 80; i++) {
+    for (int i = 0; i < 256; i++) {
         for (int j = 0; j < numbers.size(); j++) {
-            --numbers[j];
-
-            if (numbers[j] == -1) {
-                numbers[j] = 6;
-                numbers.push_back(9);
+            if (numbers[j] > 0) {
+                if (j - 1 == -1) {
+                    numbers[7] += numbers[j];
+                    numbers[9] += numbers[j];
+                } else {
+                    numbers[j - 1] += numbers[j];
+                }
+                numbers[j] -= numbers[j];
             }
         }
     }
-    cout << "SUM: " << numbers.size() << endl;
+
+    cout << "SUM: " << sum(numbers) << endl;
 
     return 0;
 }
