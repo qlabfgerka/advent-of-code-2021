@@ -20,18 +20,24 @@ int calculateStep(int j, int i) {
     return step;
 }
 
-void calculateSum(int start, int end, int i, int &sum, vector<int> numbers, bool type) {
+void calculateSum(int start, int end, int i, int &sum, vector<int> numbers, bool type, vector<int> &steps) {
+    int index;
+
     for (int j = start; j < end; j++) {
         if (!type)
             i > j ? sum += (i - j) * numbers[j] : sum += (j - i) * numbers[j];
-        else
-            sum += numbers[j] * calculateStep(j, i);
+        else {
+            index = i > j ? i - j : j - i;
+            if (steps[index] == 0) steps[index] = calculateStep(j, i);
+            sum += numbers[j] * steps[index];
+        }
     }
 }
 
 int crabs(const string &filename, bool type) {
     ifstream file(filename);
     vector<int> numbers;
+    vector<int> steps;
     int num, sum = 0, min = INT_MAX;
 
     if (!file.is_open()) {
@@ -47,10 +53,13 @@ int crabs(const string &filename, bool type) {
         if (file.peek() == ',') file.ignore();
     }
 
+    if (type)
+        steps = vector<int>(numbers.size());
+
     for (int i = 0; i < numbers.size(); i++) {
         sum = 0;
-        calculateSum(0, i, i, sum, numbers, type);
-        calculateSum(i + 1, numbers.size(), i, sum, numbers, type);
+        calculateSum(0, i, i, sum, numbers, type, steps);
+        calculateSum(i + 1, numbers.size(), i, sum, numbers, type, steps);
         if (sum < min) min = sum;
     }
 
