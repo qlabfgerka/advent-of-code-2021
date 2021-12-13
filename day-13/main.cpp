@@ -17,10 +17,8 @@ int help() {
 }
 
 void rotate(Point &p, int cx, int cy) {
-    int x1 = p.x - cx, y1 = p.y - cy;
-    int x2 = (x1 * -1), y2 = (y1 * -1);
-    p.x = x2 + cx;
-    p.y = y2 + cy;
+    p.x = ((p.x - cx) * -1) + cx;
+    p.y = ((p.y - cy) * -1) + cy;
 }
 
 tuple<int, int> getMax(vector<Point> points) {
@@ -33,19 +31,7 @@ tuple<int, int> getMax(vector<Point> points) {
     return make_tuple(maxX + 1, maxY + 1);
 }
 
-void initializeBoard(vector<vector<string>> &board, vector<Point> &points) {
-    tuple<int, int> max = getMax(points);
-
-    board.resize(get<1>(max));
-    for (int i = 0; i < get<1>(max); i++) {
-        board[i].resize(get<0>(max));
-        for (int j = 0; j < get<0>(max); j++) {
-            board[i][j] = ".";
-        }
-    }
-}
-
-int transparentOrigami(const string &filename) {
+int transparentOrigami(const string &filename, bool type) {
     ifstream file(filename);
     Point point{};
     int num;
@@ -53,7 +39,6 @@ int transparentOrigami(const string &filename) {
     stringstream ss;
     vector<Point> points;
     vector<string> instructions;
-    vector<vector<string>> board;
 
     if (!file.is_open()) {
         return help();
@@ -72,7 +57,8 @@ int transparentOrigami(const string &filename) {
         }
     }
 
-    initializeBoard(board, points);
+    tuple<int, int> max = getMax(points);
+    vector<vector<string>> board(get<1>(max), vector<string>(get<0>(max), "."));
 
     for (Point p : points) {
         board[p.y][p.x] = "#";
@@ -97,17 +83,19 @@ int transparentOrigami(const string &filename) {
                 }
             }
         }
-        break;
+        if (!type) break;
     }
 
     num = 0;
     for (int i = 0; i < board.size(); i++) {
         for (int j = 0; j < board[i].size(); j++) {
-            if (board[i][j] == "#") ++num;
+            if (type) cout << board[i][j] << " ";
+            if (!type && board[i][j] == "#") ++num;
         }
+        if (type) cout << endl;
     }
 
-    cout << num << endl;
+    if (!type) cout << num << endl;
 
     return 0;
 }
@@ -115,5 +103,5 @@ int transparentOrigami(const string &filename) {
 int main(int argc, char *argv[]) {
     if (argc != 2) return help();
 
-    return transparentOrigami(argv[1]);
+    return transparentOrigami(argv[1], true);
 }
