@@ -13,11 +13,11 @@ int help() {
 int polymerization(const string &filename) {
     ifstream file(filename);
     string line;
-    map<string, int> frequencies;
-    map<string, int> tempFrequencies;
-    map<string, int> symbolFrequencies;
+    map<string, uint64_t> frequencies;
+    map<string, uint64_t> tempFrequencies;
+    map<string, uint64_t> symbolFrequencies;
     map<string, string> instructions;
-    int max = -INT_MAX, min = INT_MAX;
+    long max = -std::numeric_limits<uint64_t>::max(), min = std::numeric_limits<uint64_t>::max();
 
     if (!file.is_open()) {
         return help();
@@ -37,18 +37,15 @@ int polymerization(const string &filename) {
         instructions[string(1, line[0]) + line[1]] = line[6];
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 40; i++) {
         for (auto &kv: frequencies) {
-            while (frequencies[kv.first] > 0) {
-                --frequencies[kv.first];
-                ++tempFrequencies[string(1, kv.first[0]) + instructions[kv.first]];
-                ++tempFrequencies[instructions[kv.first] + kv.first[1]];
-                ++symbolFrequencies[instructions[kv.first]];
-            }
+            tempFrequencies[string(1, kv.first[0]) + instructions[kv.first]] += kv.second;
+            tempFrequencies[instructions[kv.first] + kv.first[1]] += kv.second;
+            symbolFrequencies[instructions[kv.first]] += kv.second;
         }
 
         frequencies = tempFrequencies;
-        tempFrequencies = map<string, int>();
+        tempFrequencies = map<string, uint64_t>();
     }
 
     for (auto &kv: symbolFrequencies) {
